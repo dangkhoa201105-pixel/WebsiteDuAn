@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum RentalStatus {
+  PENDING
+  ACTIVE
+  RETURNED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String   @default("")
+  avatarUrl    String?
+  coverUrl     String?
+  passwordHash String
+  role         Role     @default(USER)
+  rentals      Rental[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id          String @id @default(cuid())
+  name        String @unique
+  slug        String @unique
+  books       Book[]
+}
+
+model Book {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  author      String
+  description String
+  coverUrl    String?
+  featured    Boolean  @default(false)
+  pricePerDay Int
+  stock       Int      @default(0)
+  available   Int      @default(0)
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  rentals     Rental[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Rental {
+  id         String        @id @default(cuid())
+  userId     String
+  bookId     String
+  startDate  DateTime
+  dueDate    DateTime
+  returnedAt DateTime?
+  days       Int
+  total      Int
+  status     RentalStatus  @default(PENDING)
+  user       User          @relation(fields: [userId], references: [id])
+  book       Book          @relation(fields: [bookId], references: [id])
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([userId, status])
+  @@index([bookId, dueDate])
+}
