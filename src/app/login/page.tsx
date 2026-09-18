@@ -1,0 +1,5 @@
+"use client";
+import { Form, Input, Button, Card, Typography } from "antd";
+import Link from "next/link";
+import styles from "../auth.module.css";
+export default function LoginPage() { return <main className={styles.auth}><Card className={styles.card}><Link className={styles.back} href="/">← BookNest</Link><Typography.Title level={2}>Chào mừng trở lại</Typography.Title><Typography.Paragraph>Đăng nhập để quản lý những cuốn sách đang thuê.</Typography.Paragraph><Form layout="vertical" onFinish={async (values) => { const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(values) }); if (response.ok) window.location.href = "/account"; }}><Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}><Input size="large" /></Form.Item><Form.Item name="password" label="Mật khẩu" rules={[{ required: true }]}><Input.Password size="large" /></Form.Item><Button type="primary" htmlType="submit" block size="large">Đăng nhập</Button></Form><p className={styles.switch}>Chưa có tài khoản? <Link href="/register">Đăng ký ngay</Link></p></Card></main>; }
